@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 # , Links, SideBar, BlogSettings
 from .models import Category, CNFReport, Links, SideBar, Tag, WebsiteSettings
 
-
+# @admin.register(CNFReport)
 class CNFReportListFilter(admin.SimpleListFilter):
     title = _('作者')
     parameter_name = 'author'
@@ -34,6 +34,7 @@ class CNFReportForm(forms.ModelForm):
         model = CNFReport
         fields = '__all__'
 
+# admin.site.register(CNFReport)
 
 def makr_article_publish(modeladmin, request, queryset):
     queryset.update(status='p')
@@ -62,9 +63,9 @@ class CNFReportAdmin(admin.ModelAdmin):
     search_fields = ('body', 'title')
     form = CNFReportForm
     list_display = (
-        'id', 'title', 'author', 'link_to_category', 'created_time', 'views', 'status', 'type', 'article_order')
+        'id', 'title', 'author', 'link_to_category', 'created_time', 'views', 'status', 'report_order')
     list_display_links = ('id', 'title')
-    list_filter = (CNFReportListFilter, 'status', 'type', 'category', 'tags')
+    list_filter = (CNFReportListFilter, 'status', 'category', 'tags')
     filter_horizontal = ('tags',)
     exclude = ('created_time', 'last_mod_time')
     view_on_site = True
@@ -96,23 +97,29 @@ class CNFReportAdmin(admin.ModelAdmin):
             site = get_current_site().domain
             return site
 
+admin.site.register(CNFReport, CNFReportAdmin)
+
 
 class TagAdmin(admin.ModelAdmin):
     exclude = ('slug', 'last_mod_time', 'created_time')
 
+# admin.site.register(Tag, TagAdmin)
 
 class CategoryAdmin(admin.ModelAdmin):
     exclude = ('slug', 'last_mod_time', 'created_time')
 
+# admin.site.register(Category, CategoryAdmin)
 
 class LinksAdmin(admin.ModelAdmin):
     exclude = ('last_mod_time', 'created_time')
 
+# admin.site.register(Links, LinksAdmin)
 
 class SideBarAdmin(admin.ModelAdmin):
     list_display = ('name', 'content', 'is_enable', 'sequence')
     exclude = ('last_mod_time', 'created_time')
 
+# admin.site.register(SideBar, SideBarAdmin)
 
 class WebsiteSettingsAdmin(admin.ModelAdmin):
     pass

@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'django.forms',
 
     # JH, 3rd Party Apps
+    'mdeditor',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -199,6 +200,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Django Markdown Editor confi
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -208,6 +211,10 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'collectedstatic')
 
 STATICFILES = os.path.join(BASE_DIR, 'static')
+
+# For file upload
+MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
+MEDIA_URL = '/media/'
 
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATIC_DIR_1 = os.path.abspath(os.path.join(BASE_DIR, './static'))
