@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% load static i18n %}
+{% load thumbnail %}
+{% block title %}{% trans 'Home Page' %}{% endblock %}
 
+{% block content %}
 <!-- Page Content -->
   <div class="container">
 
@@ -70,3 +73,4 @@
 
   </div>
   <!-- /.container -->
+{% endblock content %}

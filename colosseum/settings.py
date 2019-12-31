@@ -39,6 +39,12 @@ INSTALLED_APPS = [
     # 'articles.apps.ArticlesConfig',
     'users.apps.UsersConfig',
     'notifications.apps.NotificationsConfig',
+    'chartsnfigures.apps.ChartsnfiguresConfig',
+    'articles.apps.ArticlesConfig',
+    'comments.apps.CommentsConfig',
+    'servermgr.apps.ServermgrConfig',
+    'messager.apps.MessagerConfig',
+    'search.apps.SearchConfig',
 
     # System apps
     'django.contrib.auth',
@@ -55,6 +61,8 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'easy_thumbnails',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -84,13 +92,13 @@ AUTHENTICATION_BACKENDS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = 'users.User'
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
-LOGIN_REDIRECT_URL = 'chartsnfigures:index'
+LOGIN_REDIRECT_URL = 'chartsnfigure:index'
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
 LOGIN_URL = 'account_login'
 
 # django-allauth
 # ------------------------------------------------------------------------------
-ACCOUNT_ALLOW_REGISTRATION = bool('ACCOUNT_ALLOW_REGISTRATION'==True)
+ACCOUNT_ALLOW_REGISTRATION = True #bool('ACCOUNT_ALLOW_REGISTRATION'==True)
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
@@ -98,9 +106,9 @@ ACCOUNT_EMAIL_REQUIRED = True
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_ADAPTER = 'colosseum.users.adapters.AccountAdapter'
+ACCOUNT_ADAPTER = 'users.adapters.AccountAdapter'
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
-SOCIALACCOUNT_ADAPTER = 'colosseum.users.adapters.SocialAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'users.adapters.SocialAccountAdapter'
 
 
 TEMPLATES = [

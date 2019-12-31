@@ -28,6 +28,6 @@ urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
 
     # Local apps here
-    url(r'^$', include('chartsnfigures.urls')),
-    url(r'^notifications/', include('notifications.urls')),
+    path('report/', include('chartsnfigures.urls')), # home page
+    path('notifications/', include('notifications.urls')),
 ]

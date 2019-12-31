@@ -26,7 +26,6 @@
   <body>
     {% block body %}
       <div class="m-b-1">
-        {% if request.user.is_authenticated %}
           <nav class="navbar fixed-top navbar-expand-md navbar-dark bg-primary">
             <div class="container">
               <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,30 +62,31 @@
                       </div>
                     </form>
                   {% endif %}
-
-                  <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      {% comment %} {% with photo=person.photo|thumbnailer %}
-                      {% if photo %}
-                        <img src="{{ photo.small.url }}" style="border-radius: 50%;" alt="{% trans 'User Image' %}" class="user-image">
-                      {% else %} {% endcomment %}
-                        <img src="{% static 'img/user.png' %}" height="30px" alt="{% trans 'No Profile Picture' %}" />
-                      {% comment %} {% endif %}
-                      {% endwith %} {% endcomment %}
-                      {% comment %} {% endthumbnail %} {% endcomment %}
-                      {{ request.user.username }}
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <a class="dropdown-item" href="#"><i class="fa fa-cogs fa-fw" aria-hidden="true"></i>&nbsp; {% trans 'Profile Settings' %}</a>
-                      <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" href="#"><i class="fa fa-sign-out fa-fw" aria-hidden="true"></i>&nbsp; {% trans "Log Out" %}</a>
-                    </div>
-                  </li>
+                  {% if request.user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {% comment %} {% with photo=person.photo|thumbnailer %}
+                        {% if photo %}
+                          <img src="{{ photo.small.url }}" style="border-radius: 50%;" alt="{% trans 'User Image' %}" class="user-image">
+                        {% else %} {% endcomment %}
+                          <img src="{% static 'img/user.png' %}" height="30px" alt="{% trans 'No Profile Picture' %}" />
+                        {% comment %} {% endif %}
+                        {% endwith %} {% endcomment %}
+                        {% comment %} {% endthumbnail %} {% endcomment %}
+                        {{ request.user.username }}
+                      </a>
+                      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#"><i class="fa fa-cogs fa-fw" aria-hidden="true"></i>&nbsp; {% trans 'Profile Settings' %}</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#"><i class="fa fa-sign-out fa-fw" aria-hidden="true"></i>&nbsp; {% trans "Log Out" %}</a>
+                      </div>
+                    </li>
+                  {% endif %}
                 </ul>
               </div>
             </div>
           </nav>
-        {% endif %}
+        
       </div>
       <div id="header" class="container">
         {% if messages %}
