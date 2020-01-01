@@ -80,6 +80,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'colosseum.urls'
 
+# paginate
+PAGINATE_BY = 10
+
 # to avoid the /admin url can not be found error
 SITE_ID = 1
 

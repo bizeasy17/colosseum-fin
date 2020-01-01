@@ -12,7 +12,7 @@ from asgiref.sync import async_to_sync
 
 from channels.layers import get_channel_layer
 
-from slugify import slugify
+from uuslug import slugify
 
 
 class NotificationQuerySet(models.query.QuerySet):
@@ -99,7 +99,7 @@ class Notification(models.Model):
     NOTIFICATION_TYPES = (
         (LIKED, _('liked')),
         (COMMENTED, _('commented')),
-        (FAVORITED, _('cavorited')),
+        (FAVORITED, _('favorited')),
         (ANSWERED, _('answered')),
         (ACCEPTED_ANSWER, _('accepted')),
         (EDITED_ARTICLE, _('edited')),
@@ -145,7 +145,7 @@ class Notification(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(f'{self.recipient} {self.uuid_id} {self.verb}',
-                                to_lower=True, max_length=200)
+                                max_length=200, word_boundary=True)
 
         super().save(*args, **kwargs)
 

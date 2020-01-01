@@ -5,9 +5,9 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
-# Register your models here.
-# , Links, SideBar, BlogSettings
 from .models import Category, CNFReport, Links, SideBar, Tag, WebsiteSettings
+
+
 
 # @admin.register(CNFReport)
 class CNFReportListFilter(admin.SimpleListFilter):
@@ -97,29 +97,32 @@ class CNFReportAdmin(admin.ModelAdmin):
             site = get_current_site().domain
             return site
 
-admin.site.register(CNFReport, CNFReportAdmin)
-
 
 class TagAdmin(admin.ModelAdmin):
     exclude = ('slug', 'last_mod_time', 'created_time')
 
-# admin.site.register(Tag, TagAdmin)
+
 
 class CategoryAdmin(admin.ModelAdmin):
     exclude = ('slug', 'last_mod_time', 'created_time')
 
-# admin.site.register(Category, CategoryAdmin)
+
 
 class LinksAdmin(admin.ModelAdmin):
     exclude = ('last_mod_time', 'created_time')
 
-# admin.site.register(Links, LinksAdmin)
 
 class SideBarAdmin(admin.ModelAdmin):
     list_display = ('name', 'content', 'is_enable', 'sequence')
     exclude = ('last_mod_time', 'created_time')
 
-# admin.site.register(SideBar, SideBarAdmin)
 
 class WebsiteSettingsAdmin(admin.ModelAdmin):
     pass
+
+# Register your models here.
+admin.site.register(CNFReport, CNFReportAdmin)
+admin.site.register(Tag, TagAdmin)
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(Links, LinksAdmin)
+admin.site.register(SideBar, SideBarAdmin)

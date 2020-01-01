@@ -101,7 +101,7 @@ class CNFReport(BaseModel):
         get_latest_by = 'id'
 
     def get_absolute_url(self):
-        return reverse('blog:detailbyid', kwargs={
+        return reverse('chartsnfigures:detailbyid', kwargs={
             'report_id': self.id,
             'year': self.created_time.year,
             'month': self.created_time.month,
@@ -162,7 +162,7 @@ class Category(BaseModel):
         verbose_name_plural = verbose_name
 
     def get_absolute_url(self):
-        return reverse('blog:category_detail', kwargs={'category_name': self.slug})
+        return reverse('chartsnfigures:category_detail', kwargs={'category_name': self.slug})
 
     def __str__(self):
         return self.name
@@ -214,7 +214,7 @@ class Tag(BaseModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('blog:tag_detail', kwargs={'tag_name': self.slug})
+        return reverse('chartsnfigures:tag_detail', kwargs={'tag_name': self.slug})
 
     @cache_decorator(60 * 60 * 10)
     def get_report_count(self):

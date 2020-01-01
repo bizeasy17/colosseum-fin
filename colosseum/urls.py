@@ -26,15 +26,19 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # User management
+    
     url(r'^users/', include('users.urls')),
     url(r'^accounts/', include('allauth.urls')),
 
     # Local apps here
-    path('report/', include('chartsnfigures.urls')), # home page
+    # path('report/', include('chartsnfigures.urls')), # home page
+    url(r'', include('chartsnfigures.urls', namespace='chartsnfigures')),
     path('notifications/', include('notifications.urls')),
 
     # 3rd Party Apps
     url(r'mdeditor/', include('mdeditor.urls'))
+
+    
 ]
 
 if settings.DEBUG:
