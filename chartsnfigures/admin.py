@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
-from .models import Category, CNFReport, Links, SideBar, Tag, WebsiteSettings
+from .models import Category, CNFReport, Links, SideBar, Placeholder, Tag, WebsiteSettings
 
 
 
@@ -117,6 +117,11 @@ class SideBarAdmin(admin.ModelAdmin):
     exclude = ('last_mod_time', 'created_time')
 
 
+class PlaceholderAdmin(admin.ModelAdmin):
+    list_display = ('name', 'pl_type', 'is_enable', 'sequence')
+    exclude = ('slug', 'last_mod_time', 'created_time')
+
+
 class WebsiteSettingsAdmin(admin.ModelAdmin):
     pass
 
@@ -126,3 +131,4 @@ admin.site.register(Tag, TagAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Links, LinksAdmin)
 admin.site.register(SideBar, SideBarAdmin)
+admin.site.register(Placeholder, PlaceholderAdmin)

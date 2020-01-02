@@ -85,8 +85,11 @@ class CNFReport(BaseModel):
     tags = models.ManyToManyField('Tag', verbose_name=_('标签集合'), blank=True)
     featured_image = models.ImageField(
         _('特色图片'), upload_to='report_pictures/%Y/%m/%d/')
-    report_sourcefile = models.FileField(_('报告源数据文件'), upload_to='report_files/%Y/%m/%d/')
+    report_sourcefile = models.FileField(
+        _('报告源数据文件'), upload_to='report_files/%Y/%m/%d/')
     report_sourcedata = models.TextField(_('报告源数据'), blank=False, null=False)
+    to_placeholder = models.ForeignKey('PlaceHolder', verbose_name=_('栏目位'), blank=True, null=True,
+                                       on_delete=models.SET_NULL)
 
     def body_to_string(self):
         return self.body
@@ -225,14 +228,17 @@ class Tag(BaseModel):
         verbose_name = _('标签')
         verbose_name_plural = verbose_name
 
+
 class Links(models.Model):
     """友情链接"""
 
     name = models.CharField(_('链接名称'), max_length=30, unique=True)
     link = models.URLField(_('链接地址'))
     sequence = models.IntegerField(_('排序'), unique=True)
-    is_enable = models.BooleanField(_('是否显示'), default=True, blank=False, null=False)
-    show_type = models.CharField(_('显示类型'), max_length=1, choices=LINK_SHOW_TYPE, default='i')
+    is_enable = models.BooleanField(
+        _('是否显示'), default=True, blank=False, null=False)
+    show_type = models.CharField(
+        _('显示类型'), max_length=1, choices=LINK_SHOW_TYPE, default='i')
     created_time = models.DateTimeField(_('创建时间'), default=now)
     last_mod_time = models.DateTimeField(_('修改时间'), default=now)
 
@@ -262,23 +268,64 @@ class SideBar(models.Model):
     def __str__(self):
         return self.name
 
+
+PLACEHOLDER_TYPE = (
+    ('t', _('首页置顶')),
+    ('l', _('首页列表页')),
+    ('s', _('首页边栏')),
+    ('r', _('人工推荐栏')),
+)
+
+
+class Placeholder(models.Model):
+    """首页栏位,可以展示Report内容"""
+    name = models.CharField(_('栏目名称'), max_length=100)
+    # content = models.TextField(_('摘要内容'))
+    # picked_report = models.ForeignKey(
+    #     'CNFReport', on_delete=models.SET_NULL, verbose_name=_('标签集合'), null=True, blank=True)
+    pl_type = models.CharField(
+        _('栏位类型'), max_length=1, choices=PLACEHOLDER_TYPE, default='t')
+    sequence = models.IntegerField(_('排序'), unique=True)
+    is_enable = models.BooleanField(_('是否启用'), default=True)
+    created_time = models.DateTimeField(_('创建时间'), default=now)
+    last_mod_time = models.DateTimeField(_('修改时间'), default=now)
+
+    class Meta:
+        ordering = ['sequence']
+        verbose_name = _('内容栏位')
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
+
+
 class WebsiteSettings(models.Model):
     '''站点设置 '''
-    sitename = models.CharField(_('网站名称'), max_length=200, null=False, blank=False, default='')
-    site_description = models.TextField(_('网站描述'), max_length=1000, null=False, blank=False, default='')
-    site_seo_description = models.TextField(_('网站SEO描述'), max_length=1000, null=False, blank=False, default='')
-    site_keywords = models.TextField(_('网站关键字'), max_length=1000, null=False, blank=False, default='')
+    sitename = models.CharField(
+        _('网站名称'), max_length=200, null=False, blank=False, default='')
+    site_description = models.TextField(
+        _('网站描述'), max_length=1000, null=False, blank=False, default='')
+    site_seo_description = models.TextField(
+        _('网站SEO描述'), max_length=1000, null=False, blank=False, default='')
+    site_keywords = models.TextField(
+        _('网站关键字'), max_length=1000, null=False, blank=False, default='')
     cnfreport_sub_length = models.IntegerField(_('报告摘要长度'), default=300)
     sidebar_cnfreport_count = models.IntegerField(_('侧边栏报告数目'), default=10)
     sidebar_comment_count = models.IntegerField(_('侧边栏评论数目'), default=5)
     show_google_adsense = models.BooleanField(_('是否显示谷歌广告'), default=False)
-    google_adsense_codes = models.TextField(_('广告内容'), max_length=2000, null=True, blank=True, default='')
+    google_adsense_codes = models.TextField(
+        _('广告内容'), max_length=2000, null=True, blank=True, default='')
     open_site_comment = models.BooleanField(_('是否打开网站评论功能'), default=True)
-    beiancode = models.CharField(_('备案号'), max_length=2000, null=True, blank=True, default='')
-    analyticscode = models.TextField(_('网站统计代码'), max_length=1000, null=False, blank=False, default='')
-    show_gongan_code = models.BooleanField(_('是否显示公安备案号'), default=False, null=False)
-    gongan_beiancode = models.TextField(_('公安备案号'), max_length=2000, null=True, blank=True, default='')
-    resource_path = models.CharField(_('静态文件保存地址'), max_length=300, null=False, default='/var/www/resource/')
+    beiancode = models.CharField(
+        _('备案号'), max_length=2000, null=True, blank=True, default='')
+    analyticscode = models.TextField(
+        _('网站统计代码'), max_length=1000, null=False, blank=False, default='')
+    show_gongan_code = models.BooleanField(
+        _('是否显示公安备案号'), default=False, null=False)
+    gongan_beiancode = models.TextField(
+        _('公安备案号'), max_length=2000, null=True, blank=True, default='')
+    resource_path = models.CharField(
+        _('静态文件保存地址'), max_length=300, null=False, default='/var/www/resource/')
 
     class Meta:
         verbose_name = _('网站配置')
@@ -295,6 +342,7 @@ class WebsiteSettings(models.Model):
         super().save(*args, **kwargs)
         from colosseum.utils import cache
         cache.clear()
+
 
 def notify_comment(**kwargs):
     """Handler to be fired up upon comments signal to notify the author of a
