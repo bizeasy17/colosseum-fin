@@ -101,45 +101,39 @@ class CNFReportListView(ListView):
         return super(CNFReportListView, self).get_context_data(**kwargs)
 
 
-class CNFDetailView(DetailView):
+class CNFReportDetailView(DetailView):
     '''
     文章详情页面
     '''
     template_name = 'chartsnfigures/cnf_detail.html'
     model = CNFReport
-    pk_url_kwarg = 'cnfreport_id'
-    context_object_name = "cnfreport_dtl"
+    # pk_url_kwarg = 'cnfreport_id'
+    context_object_name = "cnfreport_detail"
 
-    def get_object(self, queryset=None):
-        obj = super(CNFDetailView, self).get_object()
-        obj.viewed()
-        self.object = obj
-        return obj
+    # def get_context_data(self, **kwargs):
+    #     cnfreportid = int(self.kwargs[self.pk_url_kwarg])
+    #     comment_form = CommentForm()
+    #     user = self.request.user
+    #     # 如果用户已经登录，则隐藏邮件和用户名输入框
+    #     if user.is_authenticated and not user.is_anonymous and user.email and user.username:
+    #         comment_form.fields.update({
+    #             'email': forms.CharField(widget=forms.HiddenInput()),
+    #             'name': forms.CharField(widget=forms.HiddenInput()),
+    #         })
+    #         comment_form.fields["email"].initial = user.email
+    #         comment_form.fields["name"].initial = user.username
 
-    def get_context_data(self, **kwargs):
-        cnfreportid = int(self.kwargs[self.pk_url_kwarg])
-        comment_form = CommentForm()
-        user = self.request.user
-        # 如果用户已经登录，则隐藏邮件和用户名输入框
-        if user.is_authenticated and not user.is_anonymous and user.email and user.username:
-            comment_form.fields.update({
-                'email': forms.CharField(widget=forms.HiddenInput()),
-                'name': forms.CharField(widget=forms.HiddenInput()),
-            })
-            comment_form.fields["email"].initial = user.email
-            comment_form.fields["name"].initial = user.username
+    #     cnfreport_comments = self.object.comment_list()
 
-        cnfreport_comments = self.object.comment_list()
+    #     kwargs['form'] = comment_form
+    #     kwargs['cnfreport_comments'] = cnfreport_comments
+    #     kwargs['comment_count'] = len(
+    #         cnfreport_comments) if cnfreport_comments else 0
 
-        kwargs['form'] = comment_form
-        kwargs['cnfreport_comments'] = cnfreport_comments
-        kwargs['comment_count'] = len(
-            cnfreport_comments) if cnfreport_comments else 0
+    #     kwargs['next_cnfreport'] = self.object.next_cnfreport
+    #     kwargs['prev_cnfreport'] = self.object.prev_cnfreport
 
-        kwargs['next_cnfreport'] = self.object.next_cnfreport
-        kwargs['prev_cnfreport'] = self.object.prev_cnfreport
-
-        return super(CNFReportDetailView, self).get_context_data(**kwargs)
+    #     return super(CNFReportDetailView, self).get_context_data(**kwargs)
 
 
 class CategoryDetailView(CNFReportListView):

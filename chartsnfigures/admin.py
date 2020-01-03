@@ -116,10 +116,26 @@ class SideBarAdmin(admin.ModelAdmin):
     list_display = ('name', 'content', 'is_enable', 'sequence')
     exclude = ('last_mod_time', 'created_time')
 
+class CNFReportInline(admin.TabularInline):
+    model = CNFReport
+    fieldsets = (
+        (_('基本信息'), {
+            "fields": (
+                'title', 'digest', 'views', 'category', 'pub_time'
+            ),
+        }),
+        (_('详细内容'), {
+            'classes': ('collapse',),
+            'fields': ( 'author', 'tags', ),
+        }),
+    )
+    
+    extra = 5
 
 class PlaceholderAdmin(admin.ModelAdmin):
     list_display = ('name', 'pl_type', 'is_enable', 'sequence')
     exclude = ('slug', 'last_mod_time', 'created_time')
+    # inlines = [CNFReportInline]
 
 
 class WebsiteSettingsAdmin(admin.ModelAdmin):

@@ -68,6 +68,8 @@ class CNFReport(BaseModel):
     )
 
     title = models.CharField(_('标题'), max_length=200, unique=True)
+    slug = models.SlugField(default='no-slug', max_length=200, blank=True)
+    digest = models.CharField(_('摘要'), max_length=200, null=True, blank=True)
     body = MDTextField(_('正文'))
     pub_time = models.DateTimeField(
         _('发布时间'), blank=False, null=False, default=now)
