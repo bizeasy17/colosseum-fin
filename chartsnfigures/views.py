@@ -105,13 +105,19 @@ class CNFReportDetailView(DetailView):
     '''
     文章详情页面
     '''
-    template_name = 'chartsnfigures/cnf_detail.html'
+    template_name = 'chartsnfigures/report_detail.html'
     model = CNFReport
-    # pk_url_kwarg = 'cnfreport_id'
-    context_object_name = "cnfreport_detail"
+    pk_url_kwarg = 'cnfreport_id'
+    context_object_name = "cnfreport"
+
+    def get_object(self, queryset=None):
+        obj = super(CNFReportDetailView, self).get_object()
+        obj.viewed()
+        self.object = obj
+        return obj
 
     # def get_context_data(self, **kwargs):
-    #     cnfreportid = int(self.kwargs[self.pk_url_kwarg])
+    #     cnfreport_slug = self.kwargs[self.pk_url_kwarg]
     #     comment_form = CommentForm()
     #     user = self.request.user
     #     # 如果用户已经登录，则隐藏邮件和用户名输入框

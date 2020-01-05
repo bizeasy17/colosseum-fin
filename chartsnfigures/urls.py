@@ -12,7 +12,7 @@ urlpatterns = [
 #     path(r'report/<slug:slug>',
 #          views.CNFReportDetailView.as_view(),
 #          name='detailbyslug'),
-    url(r'^(?P<slug>[-\w]+)/$', views.CNFReportDetailView.as_view(), name='report'),
+    url(r'^report/(?P<slug>[-\w]+)/$', views.CNFReportDetailView.as_view(), name='report'),
      
 
     path(r'report/<int:year>/<int:month>/<int:day>/<int:report_id>.html',

@@ -21,7 +21,7 @@
             <div class="media-object">
               {% thumbnail notification.actor.picture "x70" as im %}
                 <img src="{{ im.url }}" style="border-radius: 50%;" alt="{% trans 'Picture Profile' %}" id="pic">
-              {% empty %}
+              {% comment %} {% empty %} {% endcomment %}
                 <img src="{% static 'img/user.png' %}" height="70px" alt="{% trans 'No Profile Picture' %}" />
               {% comment %} {% endthumbnail %} {% endcomment %}
             </div>
@@ -43,8 +43,6 @@
           </div>
         </div>
       </li>
-    {% empty %}
-      Sorry nothing here
     {% endfor %}
   </ul>
 

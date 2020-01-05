@@ -1,0 +1,75 @@
+{% load blog_tags %}
+{% comment %} {% load cache %} {% endcomment %}
+ <!-- Title -->
+        <h1 class="mt-4">{{ cnfreport.title|title }}</h1>
+
+        <!-- Author -->
+        <p class="lead">
+          by
+          <a href="#">{{ cnfreport.author }}</a>
+        </p>
+
+        <hr>
+
+        <!-- Date/Time -->
+        <p>Posted on {{ cnfreport.pub_time }}</p>
+
+        <hr>
+
+        <!-- Preview Image -->
+        <img class="img-fluid rounded" src="{{ cnfreport.featured_image }}" alt="">
+
+        <hr>
+
+        <!-- Post Content -->
+        {{ cnfreport.body }}
+        <hr>
+<article id="post-{{ cnfreport.pk }} "
+         class="post-{{ cnfreport.pk }} post type-post status-publish format-standard hentry">
+    <h1 class="mt-4">
+        {% if  isindex %}
+            {% if cnfreport.report_order > 0 %}
+                <a href="{{ cnfreport.get_absolute_url }}"
+                    rel="bookmark">【置顶】{{ cnfreport.title }}</a>
+            {% else %}
+                <a href="{{ article.get_absolute_url }}"
+                    rel="bookmark">{{ cnfreport.title }}</a>
+            {% endif %}
+
+        {% else %}
+            {{ cnfreport.title }}
+        {% endif %}
+    </h1>
+    <div class="comments-link">
+        {% if cnfreport.comment_status == "o" and open_site_comment %}
+            <a href="{{ cnfreport.get_absolute_url }}#comments" class="ds-thread-count" data-thread-key="3815"
+                rel="nofollow">
+                <span class="leave-reply">
+                {% if cnfreport.comment and cnfreport.comment_set.count %}
+                    {{ cnfreport.comment_set.count }}个评论
+                {% else %}
+                    发表评论
+                {% endif %}
+                </span>
+            </a>
+        {% endif %}
+        <div style="float:right">
+            {{ cnfreport.views }} views
+        </div>
+    </div><!-- .comments-link -->
+    <br/>
+
+    <div class="entry-content" itemprop="reportBody">
+        {% if  isindex %}
+            {{ cnfreport.body|custom_markdown|escape|truncatechars_content }}
+            <p class='read-more'><a
+                    href=' {{ cnfreport.get_absolute_url }}'>Read more</a></p>
+        {% else %}
+            {{ cnfreport.body|custom_markdown }}
+        {% endif %}
+
+    </div><!-- .entry-content -->
+
+    {% load_report_metas cnreport user %}
+
+</article><!-- #post -->

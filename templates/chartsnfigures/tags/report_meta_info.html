@@ -1,0 +1,45 @@
+{% load blog_tags %}
+{% load i18n %}
+
+<footer class="entry-meta">
+    {% trans "发布于" %}<a href="{{ cnfreport.get_absolute_url }}" title="{% datetimeformat cnfreport.pub_time %}"
+                itemprop="datePublished" content="{% datetimeformat cnfreport.pub_time %}"
+                rel="bookmark">
+
+                <time class="entry-date updated"
+                        datetime="{{ cnfreport.pub_time }}">
+                    {% datetimeformat cnfreport.pub_time %}</time>
+                </a>
+    
+                属于<a href="{{ cnfreport.category.get_absolute_url }}" rel="category tag">{{ cnfreport.category.name }}</a>
+                分类，
+                {% if cnfreport.tags.all %}
+                    {% for t in cnfreport.tags.all %}
+                        <a href="{{ t.get_absolute_url }}" rel="tag">{{ t.name }}</a>
+                        {% if t != cnfreport.tags.all.last %}
+                            ，
+                        {% endif %}
+                    {% endfor %}
+
+                   
+                {% endif %}
+    
+    <span class="by-author">{% trans "作者是" %}
+        <span class="author vcard">
+            <a class="url fn n" href="{{ cnfreport.author.get_absolute_url }}"
+            title={% trans "查看所有由" %}{{ cnfreport.author.last_name }}{{cnfreport.author.first_name }}{% trans "发布的文章" %}
+            rel="author">
+            <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+
+                <span itemprop="name" itemprop="publisher">
+                    {{ cnfreport.author.last_name}}{{cnfreport.author.first_name }}
+                </span>
+            </span>
+            </a>
+        </span>。
+        {% if user.is_superuser %}
+            <a href="{{ cnfreport.get_admin_url }}">{% trans "编辑" %}</a>
+        {% endif %}
+    </span>
+</footer><!-- .entry-meta -->
+
