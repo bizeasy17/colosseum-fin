@@ -1,9 +1,9 @@
 from django import forms
-from .models import CNFReport
+from .models import TradeRec
 
-class CNFReportForm(forms.ModelForm):
+class TradeRecForm(forms.ModelForm):
     # body = forms.CharField(widget=AdminPagedownWidget())
 
     class Meta:
-        model = CNFReport
+        model = TradeRec
         fields = '__all__'

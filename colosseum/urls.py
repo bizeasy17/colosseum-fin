@@ -33,12 +33,11 @@ urlpatterns = [
     # Local apps here
     # path('report/', include('chartsnfigures.urls')), # home page
     url(r'', include('chartsnfigures.urls', namespace='chartsnfigures')),
+    path('traderec/', include('traderec.urls')),
     path('notifications/', include('notifications.urls')),
 
     # 3rd Party Apps
-    url(r'mdeditor/', include('mdeditor.urls'))
-
-    
+    url(r'mdeditor/', include('mdeditor.urls')),
 ]
 
 if settings.DEBUG:

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'servermgr.apps.ServermgrConfig',
     'messager.apps.MessagerConfig',
     'search.apps.SearchConfig',
+    'traderec.apps.TraderecConfig',
 
     # System apps
     'django.contrib.auth',

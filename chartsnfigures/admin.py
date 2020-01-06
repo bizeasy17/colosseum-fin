@@ -1,12 +1,12 @@
-from django import forms
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
-from .models import Category, CNFReport, Links, SideBar, Placeholder, Tag, WebsiteSettings
-
+from .forms import CNFReportForm
+from .models import (Category, CNFReport, Links, Placeholder, SideBar, Tag,
+                     WebsiteSettings)
 
 
 # @admin.register(CNFReport)
@@ -27,35 +27,29 @@ class CNFReportListFilter(admin.SimpleListFilter):
             return queryset
 
 
-class CNFReportForm(forms.ModelForm):
-    # body = forms.CharField(widget=AdminPagedownWidget())
-
-    class Meta:
-        model = CNFReport
-        fields = '__all__'
 
 # admin.site.register(CNFReport)
 
-def makr_article_publish(modeladmin, request, queryset):
+def makr_report_publish(modeladmin, request, queryset):
     queryset.update(status='p')
 
 
-def draft_article(modeladmin, request, queryset):
+def draft_report(modeladmin, request, queryset):
     queryset.update(status='d')
 
 
-def close_article_commentstatus(modeladmin, request, queryset):
+def close_report_commentstatus(modeladmin, request, queryset):
     queryset.update(comment_status='c')
 
 
-def open_article_commentstatus(modeladmin, request, queryset):
+def open_report_commentstatus(modeladmin, request, queryset):
     queryset.update(comment_status='o')
 
 
-makr_article_publish.short_description = _('发布选中文章')
-draft_article.short_description = _('选中文章设置为草稿')
-close_article_commentstatus.short_description = _('关闭文章评论')
-open_article_commentstatus.short_description = _('打开文章评论')
+makr_report_publish.short_description = _('发布选中报告')
+draft_report.short_description = _('选中报告设置为草稿')
+close_report_commentstatus.short_description = _('关闭报告评论功能')
+open_report_commentstatus.short_description = _('打开报告评论功能')
 
 
 class CNFReportAdmin(admin.ModelAdmin):
@@ -69,8 +63,8 @@ class CNFReportAdmin(admin.ModelAdmin):
     filter_horizontal = ('tags',)
     exclude = ('created_time', 'last_mod_time')
     view_on_site = True
-    actions = [makr_article_publish, draft_article,
-               close_article_commentstatus, open_article_commentstatus]
+    actions = [makr_report_publish, draft_report,
+               close_report_commentstatus, open_report_commentstatus]
 
     def link_to_category(self, obj):
         info = (obj.category._meta.app_label, obj.category._meta.model_name)

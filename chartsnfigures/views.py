@@ -3,11 +3,12 @@ from django.shortcuts import render
 # Create your views here.
 import os
 import datetime
+
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.conf import settings
 from django import forms
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from colosseum.utils import cache, get_md5, get_blog_setting
@@ -100,6 +101,10 @@ class CNFReportListView(ListView):
         kwargs['linktype'] = self.link_type
         return super(CNFReportListView, self).get_context_data(**kwargs)
 
+
+def get_data(request, *args, **kwargs):
+    data = [4888, 5312, 6251, 7841, 6589, 4983]
+    return JsonResponse(data, safe=False)
 
 class CNFReportDetailView(DetailView):
     '''
@@ -305,7 +310,6 @@ def fileupload(request):
 
     else:
         return HttpResponse("only for post")
-
 
 @login_required
 def refresh_memcache(request):
