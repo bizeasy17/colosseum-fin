@@ -34,8 +34,8 @@ class TradeRecAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'author', 'stock_name', 'direction', 'price', 'link_to_strategy', 'created_time', 'views')
     list_display_links = ('id', 'stock_name')
-    list_filter = (TradeRecListFilter, 'status', 'strategy', 'tags')
-    filter_horizontal = ('tags',)
+    list_filter = (TradeRecListFilter, 'status', 'strategy', 'flag')
+    # filter_horizontal = ('flag',)
     exclude = ('created_time', 'last_mod_time')
     view_on_site = True
     # actions = [makr_report_publish, draft_report,

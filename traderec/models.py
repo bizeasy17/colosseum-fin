@@ -4,13 +4,17 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
+from colosseum.utils import cache, cache_decorator, get_current_site
 from uuslug import slugify
 
 logger = logging.getLogger(__name__)
 
 # Create your models here.
+
+
 class BaseModel(models.Model):
     id = models.AutoField(primary_key=True)
     created_time = models.DateTimeField('创建时间', default=now)
@@ -23,9 +27,9 @@ class BaseModel(models.Model):
             TradeRec.objects.filter(pk=self.pk).update(views=self.views)
         else:
             if 'slug' in self.__dict__:
-                slug = getattr(self, 'title') if 'title' in self.__dict__ else getattr(
-                    self, 'name')
-                setattr(self, 'slug', slugify(slug))
+                slug = getattr(self, 'stock_code') if 'stock_code' in self.__dict__ else getattr(
+                    self, 'stock_name')
+                setattr(self, 'slug', slugify(slug + id))
             super().save(*args, **kwargs)
 
     def get_full_url(self):
@@ -48,6 +52,10 @@ class TradeRec(BaseModel):
         ('d', _('草稿')),
         ('p', _('发表')),
     )
+    # MARKET_CHOICES = (
+    #     ('sa', _('上海A股')),
+    #     ('p', _('发表')),
+    # )
     VISIBLE_CHOICES = (
         ('g', _('公开')),
         ('s', _('私密')),
@@ -61,18 +69,28 @@ class TradeRec(BaseModel):
         ('b', _('买入')),
         ('s', _('卖出')),
     )
+    TRADE_FLAG = (
+        ('s', _('首次建仓')),
+        ('f', _('清仓')),
+    )
 
     # slug = models.SlugField(default='no-slug', max_length=200, blank=True)
-    market = models.CharField(_('市场'), blank=True, null=True)
-    stock_name = models.CharField(_('股票名称'), blank=False, null=False)
-    stock_code = models.CharField(_('股票代码'), blank=False, null=False)
+    market = models.CharField(_('市场'), max_length=50, blank=True, null=True)
+    stock_name = models.CharField(
+        _('股票名称'), max_length=50, blank=False, null=False)
+    stock_code = models.CharField(
+        _('股票代码'), max_length=50, blank=False, null=False)
     direction = models.CharField(_('交易类型'), max_length=1,
                                   choices=TRADE_DIRECTION, default='b')
+    flag = models.CharField(_('交易标签'), max_length=1,
+                                  choices=TRADE_FLAG, default='b', blank=True, null=True)
     price = models.FloatField(_('交易价格'), blank=False, null=False)
-    position = models.CharField(_('交易价格'), blank=False, null=False)
+    cash = models.FloatField(_('投入现金额'), blank=True, null=True)
+    position = models.CharField(
+        _('仓位'), max_length=50, blank=False, null=False)
     pub_time = models.DateTimeField(
         _('发布时间'), blank=False, null=False, default=now)
-    status = models.CharField(_('记录状态'), max_length=1,
+    status = models.CharField(_('发布状态'), max_length=1,
                               choices=STATUS_CHOICES, default='p')
     visible = models.CharField(_('可见性'), max_length=1,
                                choices=VISIBLE_CHOICES, default='s')
@@ -83,12 +101,12 @@ class TradeRec(BaseModel):
                                on_delete=models.CASCADE)
     strategy = models.ForeignKey(
         'TradeStrategy', verbose_name=_('策略'), on_delete=models.SET_NULL, blank=True, null=True)
-    tags = models.ManyToManyField('Tag', verbose_name=_('标签集合'), blank=True)
+    # tags = models.ManyToManyField('Tag', verbose_name=_('标签集合'), blank=True)
     featured_image = models.ImageField(
-        _('特色图片'), upload_to='report_pictures/%Y/%m/%d/')
+        _('特色图片'), upload_to='traderec_pictures/%Y/%m/%d/', blank=True, null=True)
 
     def __str__(self):
-        return self.title
+        return self.stock_name
 
     class Meta:
         ordering = ['-pub_time']
@@ -111,7 +129,10 @@ class TradeRec(BaseModel):
 
         return names
 
-    def save(self, *args, **kwargs):
+    def save(self, request, *args, **kwargs):
+        # if not self.author_id:
+        #     self.author_id = self.request.user.id
+
         super().save(*args, **kwargs)
 
     def viewed(self):
@@ -188,3 +209,23 @@ class TradeStrategy(BaseModel):
 
         parse(self)
         return strategies
+
+class Tag(BaseModel):
+    """交易记录标签"""
+    name = models.CharField(_('标签名'), max_length=30, unique=True)
+    slug = models.SlugField(default='no-slug', max_length=60, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('traderec:tag_detail', kwargs={'tag_name': self.slug})
+
+    # @cache_decorator(60 * 60 * 10)
+    def get_traderec_count(self):
+        return TradeRec.objects.filter(tags__name=self.name).distinct().count()
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = _('标签')
+        verbose_name_plural = verbose_name
