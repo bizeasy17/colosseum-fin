@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'easy_thumbnails',
     'crispy_forms',
+    'tushare',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

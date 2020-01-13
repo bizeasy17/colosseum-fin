@@ -71,11 +71,16 @@ class TradeRec(BaseModel):
     )
     TRADE_FLAG = (
         ('s', _('首次建仓')),
+        ('n', _('正常买入/卖出')),
         ('f', _('清仓')),
+    )
+    MARKET_CHOICE = (
+        ('sh', _('上海')),
+        ('sz', _('深圳')),
     )
 
     # slug = models.SlugField(default='no-slug', max_length=200, blank=True)
-    market = models.CharField(_('市场'), max_length=50, blank=True, null=True)
+    market = models.CharField(_('股票市场'), choices=MARKET_CHOICE, max_length=50, blank=True, null=True)
     stock_name = models.CharField(
         _('股票名称'), max_length=50, blank=False, null=False)
     stock_code = models.CharField(
@@ -84,6 +89,8 @@ class TradeRec(BaseModel):
                                   choices=TRADE_DIRECTION, default='b')
     flag = models.CharField(_('交易标签'), max_length=1,
                                   choices=TRADE_FLAG, default='b', blank=True, null=True)
+    # 交易日期
+    trade_time = models.DateTimeField('交易时间', default=now, blank=False, null=False) 
     price = models.FloatField(_('交易价格'), blank=False, null=False)
     cash = models.FloatField(_('投入现金额'), blank=True, null=True)
     position = models.CharField(

@@ -29,3 +29,9 @@ channels-redis>=2.2.1  # https://github.com/django/channels_redis
 # GraphQL API
 # ------------------------------------------------------------------------------
 graphene-django>=2.0  # https://github.com/graphql-python/graphene-django
+
+# Tushare
+lxml  # https://github.com/lxml/lxml
+Pandas # https://github.com/pandas-dev/pandas
+tushare # https://github.com/waditu/tushare
+bs4 # https://code.launchpad.net/beautifulsoup

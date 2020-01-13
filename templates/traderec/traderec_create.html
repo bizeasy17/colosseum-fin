@@ -6,14 +6,79 @@
     <div class="row">
         <!-- Chart & Figures Column -->
         <div class="col-lg-8">
-           
+           <!-- Bar Chart -->
+            <div class="card mb-4 mr-3">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Bar Chart</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-bar">
+                    <canvas id="myStockChart"></canvas>
+                    </div>
+                    <hr>
+                    Styling for the bar chart can be found in the <code>/js/demo/chart-bar-demo.js</code> file.
+                </div>
+                <div>
+                    Bar Type:
+                    <select id="type">
+                        <option value="candlestick" selected>Candlestick</option>
+                        <option value="ohlc">OHLC</option>
+                    </select>
+                    Color Scheme:
+                    <select id="color-scheme">
+                        <option value="muted" selected>Muted</option>
+                        <option value="neon">Neon</option>
+                    </select>
+                    Border:
+                    <select id="border">
+                        <option value="true" selected>Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                    <button id="update">Update</button>
+                    <button id="randomizeData">Randomize Data</button>
+                </div>
+            </div>
         </div> 
 
          <!-- Sidebar Widgets Column -->
         <div class="col-md-4">
               <form action="{% url 'traderec:create_new' %}" enctype="multipart/form-data"  id="traderec-form" method="post" role="form">
                 {% csrf_token %}
-                {{ form|crispy }}
+                {% comment %} {{ form|crispy }} {% endcomment %}
+                {{ form.trade_time|as_crispy_field }}
+                {{ form.market|as_crispy_field }}
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.stock_name|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.stock_code|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.strategy|as_crispy_field }}
+                    </div>
+                     <div class="form-group col-md-6 mb-0">
+                        {{ form.flag|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.direction|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.price|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.cash|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.position|as_crispy_field }}
+                    </div>
+                </div>
                 <button type="submit" class="btn btn-primary">{% trans '创建' %}</button>
             </form>
         </div>

@@ -1,21 +1,22 @@
-from django.shortcuts import render
-
+import datetime
+import logging
 # Create your views here.
 import os
-import datetime
 
-from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
-from django.conf import settings
 from django import forms
-from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, HttpResponseForbidden
-from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from colosseum.utils import cache, get_md5, get_blog_setting
-from django.shortcuts import get_object_or_404
-from .models import CNFReport, Category, Tag, Links
+from django.http import (HttpResponse, HttpResponseForbidden,
+                         HttpResponseRedirect, JsonResponse)
+from django.shortcuts import get_object_or_404, render
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
+
+from colosseum.utils import cache, get_blog_setting, get_md5
 from comments.forms import CommentForm
-import logging
+
+from .models import Category, CNFReport, Links, Tag
 
 logger = logging.getLogger(__name__)
 
