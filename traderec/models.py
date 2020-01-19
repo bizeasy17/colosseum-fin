@@ -153,7 +153,7 @@ class TradeRec(BaseModel):
         if self.stock_code.isnumeric():
             self.stock_code = self.stock_code + '.' + self.market
         # 更新持仓
-        Positions.objects.pos_cal_algorithm(, self)
+        Positions.objects.pos_cal_algorithm(self)
         super().save(*args, **kwargs)
 
     def viewed(self):
@@ -212,7 +212,8 @@ class Positions(BaseModel):
         trade_price = trade_rec.price
         df = ts.get_realtime_quotes(ts_code)
         realtime_price = df[['price']]
-        current_stock_position = Positions.objects.get(author=user,stock_code=ts_code,is_liquadated='n')
+        current_stock_position = Positions.objects.get(
+            author=user, stock_code=ts_code, is_liquadated='n')
 
         # 已经有持仓
         if current_stock_position is not None:
@@ -220,21 +221,53 @@ class Positions(BaseModel):
                 # 已有仓位加仓
                 '''
                 1. 利润 = 原持仓利润 + (当前股票价格：如果未收盘/收盘价 - 交易价格) * 本次交易量(手) * 100 (1手=100股)
-                2. 
+                2. 持仓价格 = 
+                2.1 如果利润是(负-)的
+                    每手亏损 = 利润 / (已有持仓+新增持仓量(手)）
+                    持仓价格 = 当前股票价格：如果未收盘/收盘价 + 每手亏损
+                2.2 如果利润是(正+)的
+                    每手利润 = 利润 / (已有持仓+新增持仓量(手)）
+                    持仓价格 = 当前股票价格：如果未收盘/收盘价 - 每手利润
                 '''
-                profit = current_stock_position.profit + (realtime_price - trade_price) * trade_rec.lots * 100
-                
-                new_position_price = realtime_price - profit / (trade_rec.lots + current_stock_position.lots)
-            else: # 已有仓位减仓
+                profit = current_stock_position.profit + \
+                    (realtime_price - trade_price) * trade_rec.lots * 100
+                new_position_price = realtime_price - profit / \
+                    (trade_rec.lots + current_stock_position.lots)
+                current_stock_position.position_price = new_position_price
+                current_stock_position.current_price = realtime_price
+                current_stock_position.profit = profit
+                current_stock_position.lots = trade_rec.lots + current_stock_position.lots
+                current_stock_position.save()
+            else:  # 已有仓位减仓
                 if trade_rec.flag == 'l':
                     # 清仓，设置is_liquadated = 'y'
+                    current_stock_position.is_liquadated = 'y'
 
                 else:
-
+                     # 普通减仓
+                    '''
+                    1. 利润 = 原持仓利润 + (当前股票价格：如果未收盘/收盘价 - 交易价格) * 本次交易量(手) * 100 (1手=100股)
+                    2. 持仓价格 = 
+                    2.1 如果利润是(负-)的
+                        每手亏损 = 利润 / (已有持仓-卖出量(手)）
+                        持仓价格 = 当前股票价格：如果未收盘/收盘价 + 每手亏损
+                    2.2 如果利润是(正+)的
+                        每手利润 = 利润 / (已有持仓-卖出量(手)）
+                        持仓价格 = 当前股票价格：如果未收盘/收盘价 - 每手利润
+                    '''
+                    profit = current_stock_position.profit + \
+                        (realtime_price - trade_price) * trade_rec.lots * 100
+                    new_position_price = realtime_price - profit / \
+                        (trade_rec.lots - current_stock_position.lots)
+                    current_stock_position.position_price = new_position_price
+                    current_stock_position.current_price = realtime_price
+                    current_stock_position.profit = profit
+                    current_stock_position.lots = trade_rec.lots + current_stock_position.lots
+                    current_stock_position.save()
         else:  # 新建仓
             profit = (realtime_price - trade_price) * trade_rec.lots * 100
-            p = Positions(trade_rec.stock_code[:2], trade_rec.stock_name, trade_rec.stock_code, u,
-                          trade_rec.price, profit, trade_rec.cash, trade_rec.lots, trade_rec.position)
+            p = Positions(stock_code=trade_rec.stock_code[:2], stock_name=trade_rec.stock_name, author=user,
+                          position_price=trade_rec.price, current_price=realtime_price, profit=profit, cash=trade_rec.cash, lots=trade_rec.lots, position=trade_rec.position)
             p.save()
 
     class Meta:
