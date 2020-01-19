@@ -44,6 +44,7 @@ def get_name(request, ts_code):
 
     return render(request, 'traderec/name.html', {'form': form})
 
+
 @login_required
 def get_stockcode_by_name(request, stock_name):
     if request.method == 'GET':
@@ -53,6 +54,7 @@ def get_stockcode_by_name(request, stock_name):
                 return HttpResponse(r.stock_code)
     return HttpResponse(_('无法找到该股票'))
 
+
 @login_required
 def get_stockname_by_code(request, stock_code):
     if request.method == 'GET':
@@ -61,6 +63,7 @@ def get_stockname_by_code(request, stock_code):
             for r in result:
                 return HttpResponse(r.stock_name)
     return HttpResponse(_('无法找到该股票'))
+
 
 @login_required
 def get_realtime_quotes(request, ts_code):
@@ -85,6 +88,7 @@ def get_realtime_quotes(request, ts_code):
 
     return HttpResponse('hello')
 
+
 @login_required
 def get_stock_kline(request, ts_code, start_date, end_date):
     df = []
@@ -106,7 +110,7 @@ def get_stock_kline(request, ts_code, start_date, end_date):
         if request.method == 'GET':
             # create a form instance and populate it with data from the request:
             df = pro.daily(ts_code=ts_code, start_date=start_date,
-                        end_date=end_date)
+                           end_date=end_date)
             data = []
             if df is not None and len(df) > 0:
                 for d in df.values:
@@ -124,6 +128,8 @@ def get_stock_kline(request, ts_code, start_date, end_date):
 
 # Create your views here.
 # @login_required
+
+
 def get_stock_kline_ext(request, ts_code, start_date, end_date):
     df = []
 
@@ -144,7 +150,7 @@ def get_stock_kline_ext(request, ts_code, start_date, end_date):
         if request.method == 'GET':
             # create a form instance and populate it with data from the request:
             df = pro.daily(ts_code=ts_code, start_date=start_date,
-                        end_date=end_date)
+                           end_date=end_date)
             data = []
             traderec = []
             if df is not None and len(df) > 0:
@@ -166,7 +172,8 @@ def get_stock_kline_ext(request, ts_code, start_date, end_date):
 
 
 def get_traderec(stock_code, trade_time):
-    traderec_list = TradeRec.objects.filter(stock_code=stock_code,trade_time=trade_time)
+    traderec_list = TradeRec.objects.filter(
+        stock_code=stock_code, trade_time=trade_time)
 
     traderec = []
     if traderec_list is not None:
@@ -180,6 +187,30 @@ def get_traderec(stock_code, trade_time):
             })
 
     return traderec
+
+def traderec_create_post(request):
+    if request.method == 'POST':
+        post_text = request.POST.get('the_post')
+        response_data = {}
+
+        post = Post(text=post_text, author=request.user)
+        post.save()
+
+        response_data['result'] = 'Create post successful!'
+        response_data['postpk'] = post.pk
+        response_data['text'] = post.text
+        response_data['created'] = post.created.strftime('%B %d, %Y %I:%M %p')
+        response_data['author'] = post.author.username
+
+        return HttpResponse(
+            json.dumps(response_data),
+            content_type="application/json"
+        )
+    else:
+        return HttpResponse(
+            json.dumps({"nothing to see": "this isn't happening"}),
+            content_type="application/json"
+        )
 
 class IndexView(ListView):
     # template_name属性用于指定使用哪个模板进行渲染

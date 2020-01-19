@@ -51,8 +51,8 @@ class BaseModel(models.Model):
 
 
 MARKET_CHOICE = (
-    ('sh', _('上海')),
-    ('sz', _('深圳')),
+    ('SH', _('上海')),
+    ('SZ', _('深圳')),
 )
 
 
@@ -120,8 +120,8 @@ class TradeRec(BaseModel):
     # tags = models.ManyToManyField('Tag', verbose_name=_('标签集合'), blank=True)
     featured_image = models.ImageField(
         _('特色图片'), upload_to='traderec_pictures/%Y/%m/%d/', blank=True, null=True)
-    # total_hold_positions = models.ForeignKey('Positions', verbose_name=_('股票持仓'), blank=False, null=False,
-    #                            on_delete=models.CASCADE)
+    stock_positions_master = models.ForeignKey('Positions', verbose_name=_('股票持仓'), blank=False, null=True,
+                               on_delete=models.CASCADE)
     is_deleted = models.CharField(
         _('是否被删除'), max_length=1, blank=False, null=False, default='n', editable=False)
 
@@ -153,7 +153,8 @@ class TradeRec(BaseModel):
         if self.stock_code.isnumeric():
             self.stock_code = self.stock_code + '.' + self.market
         # 更新持仓
-        Positions.objects.pos_cal_algorithm(self)
+        p = Positions.objects.pos_cal_algorithm(self)
+        self.stock_positions_master = p
         super().save(*args, **kwargs)
 
     def viewed(self):
@@ -187,7 +188,7 @@ class Positions(BaseModel):
         _('股票名称'), max_length=50, blank=False, null=False)
     stock_code = models.CharField(
         _('股票代码'), max_length=50, blank=False, null=False)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('持仓人'), blank=False, null=False,
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('持仓人'), blank=False, null=True,
                                on_delete=models.CASCADE)
     position_price = models.FloatField(
         _('持仓价格'), blank=False, null=False, default=0)
@@ -199,7 +200,7 @@ class Positions(BaseModel):
     position = models.CharField(
         _('仓位'), max_length=50, blank=False, null=False)
     is_liquadated = models.CharField(
-        _('是否清仓'), max_length=1, blank=False, null=False, default='n', editable=false, db_index=True)
+        _('是否清仓'), max_length=1, blank=False, null=False, default='n', editable=False, db_index=True)
 
     def __str__(self):
         return self.stock_name
@@ -242,7 +243,6 @@ class Positions(BaseModel):
                 if trade_rec.flag == 'l':
                     # 清仓，设置is_liquadated = 'y'
                     current_stock_position.is_liquadated = 'y'
-
                 else:
                      # 普通减仓
                     '''
@@ -264,11 +264,13 @@ class Positions(BaseModel):
                     current_stock_position.profit = profit
                     current_stock_position.lots = trade_rec.lots + current_stock_position.lots
                     current_stock_position.save()
+            return current_stock_position
         else:  # 新建仓
             profit = (realtime_price - trade_price) * trade_rec.lots * 100
             p = Positions(stock_code=trade_rec.stock_code[:2], stock_name=trade_rec.stock_name, author=user,
                           position_price=trade_rec.price, current_price=realtime_price, profit=profit, cash=trade_rec.cash, lots=trade_rec.lots, position=trade_rec.position)
             p.save()
+            return p
 
     class Meta:
         ordering = ['-last_mod_time']

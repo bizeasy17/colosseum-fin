@@ -45,6 +45,9 @@ class TradeRecForm(forms.ModelForm):
         #            'featured_image', 'author', 'views', 'comment_status']
         fields = ['author', 'market', 'stock_name', 'stock_code', 'strategy',
                   'direction', 'trade_time', 'flag', 'price', 'cash', 'position', ]
+        labels = {
+            'stock_name': _('股票名称或代码'),
+        }
 
 
 class NameForm(forms.Form):
