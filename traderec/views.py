@@ -202,15 +202,9 @@ def traderec_create_post(request):
         response_data['created'] = post.created.strftime('%B %d, %Y %I:%M %p')
         response_data['author'] = post.author.username
 
-        return HttpResponse(
-            json.dumps(response_data),
-            content_type="application/json"
-        )
+        return JsonResponse(response_data)
     else:
-        return HttpResponse(
-            json.dumps({"nothing to see": "this isn't happening"}),
-            content_type="application/json"
-        )
+        return JsonResponse({"nothing to see": "this isn't happening"})
 
 class IndexView(ListView):
     # template_name属性用于指定使用哪个模板进行渲染
