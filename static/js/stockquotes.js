@@ -20,7 +20,8 @@ $(function () {
         var stockCode = '000001.SZ'; //getStockcodeByName(stockName);
         var startDate = '20191201';
         var endDate = '20191231';
-        showStockKline(stockName, stockCode, startDate, endDate);
+        // showStockKline(stockName, stockCode, startDate, endDate);
+        showStockKlineByName(stockName, startDate, endDate)
     });
 
     // when lost focus get the code auto filled
@@ -30,12 +31,23 @@ $(function () {
         // $('#id_stock_code').val('000001');
         // mock for now
         var stockCode = document.getElementById('id_stock_code').value;
-        var stockName = getStocknameByCode(stockCode);
         var startDate = '20191201';
         var endDate = '20191231'
         
-        showStockKline(stockName, stockCode, startDate, endDate);
+        showStockKlineByCode(stockCode, startDate, endDate);
     });
+
+    function getStockcodeByName1(callback){
+        var stockCode;
+        var stockCodeEndpoint = stockCodeBaseEndpoint + arguments[1];
+        $.ajax({
+            url: stockCodeEndpoint,
+            success: function(data){
+                stockCode = data;
+                callback(arguments[1], arguments[2], arguments[3], stockCode);
+            }
+        });
+    }
 
     function getStockcodeByName(stockName){
         var stockCode;
@@ -63,9 +75,26 @@ $(function () {
 
     // var barCount = 60;
     // var initialDateStr = '20200110';
-    function showStockKline(stockName, stockCode, startDate, endDate){
+    function showStockKlineByName(stockName, startDate, endDate){
+        // Bar Chart Example
+        var stockCodeEndpoint = stockCodeBaseEndpoint + stockName;
+        $.ajax({
+            url: stockCodeEndpoint,
+            success: function(data){
+                stockCode = data;
+                var klineEndpoint = klineBaseEndpoint + stockCode + '/' + startDate + '/' + endDate;
+                chartRender(klineEndpoint, stockName, stockCode);  
+            }
+        });
+    }
+
+    function showStockKlineByCode(stockCode, startDate, endDate){
         // Bar Chart Example
         var klineEndpoint = klineBaseEndpoint + stockCode + '/' + startDate + '/' + endDate;
+        chartRender(klineEndpoint, '', stockCode);
+    }
+
+    function chartRender(klineEndpoint, stockName, stockCode){
         $.ajax({
             url: klineEndpoint,
             success: function(data){
@@ -73,7 +102,7 @@ $(function () {
                     type: 'candlestick',
                     data: {
                         datasets: [{
-                            label: stockCode + '-' + stockName,
+                            label: stockCode + ' - ' + stockName,
                             data: data,
                         }]
                     },
@@ -111,7 +140,7 @@ $(function () {
                     }
                 });
             }
-        });    
+        }); 
     }
 
     function showStockRealtimeQuote(stockCode, canvasId){

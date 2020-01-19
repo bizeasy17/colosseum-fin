@@ -46,15 +46,16 @@
                 {% csrf_token %}
                 {% comment %} {{ form|crispy }} {% endcomment %}
                 {{ form.trade_time|as_crispy_field }}
-                {{ form.market|as_crispy_field }}
+                {{ form.stock_name|as_crispy_field }}
+                {% comment %} {{ form.market|as_crispy_field }} {% endcomment %}
                 <div class="form-row">
                     <div class="form-group col-md-6 mb-0">
-                        {{ form.stock_name|as_crispy_field }}
+                        {{ form.market.as_hidden }}
                     </div>
                     <div class="form-group col-md-6 mb-0">
-                        {{ form.stock_code|as_crispy_field }}
+                        {{ form.stock_code.as_hidden }}
                     </div>
-                </div>
+                </div> 
                 <div class="form-row">
                     <div class="form-group col-md-6 mb-0">
                         {{ form.strategy|as_crispy_field }}
@@ -73,11 +74,11 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6 mb-0">
-                        {{ form.cash|as_crispy_field }}
-                    </div>
-                    <div class="form-group col-md-6 mb-0">
                         {{ form.position|as_crispy_field }}
                     </div>
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.cash|as_crispy_field }}
+                    </div>      
                 </div>
                 <button type="submit" class="btn btn-primary">{% trans '创建' %}</button>
             </form>

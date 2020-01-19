@@ -1,7 +1,9 @@
+import random
 from datetime import datetime
 
 import tushare as ts
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -15,7 +17,7 @@ from colosseum.helpers import AuthorRequiredMixin
 
 # sample form
 from .forms import NameForm, TradeRecForm
-from .models import TradeRec, TradeStrategy
+from .models import TradeRec, TradeStrategy, Positions, StockNameCodeMap
 
 # token settings (to be moved)
 ts.set_token('3ebfccf82c537f1e8010e97707393003c1d98b86907dfd09f9d17589')
@@ -42,20 +44,25 @@ def get_name(request, ts_code):
 
     return render(request, 'traderec/name.html', {'form': form})
 
-def get_stockcode(request, stock_name):
-    if request.method == 'POST':
-        return HttpResponse('000001.SZ')
-    else:
-        return HttpResponse('000001.SZ')
-    return HttpResponse('000001.SZ')
+@login_required
+def get_stockcode_by_name(request, stock_name):
+    if request.method == 'GET':
+        result = StockNameCodeMap.objects.filter(stock_name=stock_name)
+        if result is not None:
+            for r in result:
+                return HttpResponse(r.stock_code)
+    return HttpResponse(_('无法找到该股票'))
 
-def get_stockname(request, stock_code):
-    if request.method == 'POST':
-        return HttpResponse('平安银行')
-    else:
-        return HttpResponse('平安银行')
-    return HttpResponse('平安银行')
+@login_required
+def get_stockname_by_code(request, stock_code):
+    if request.method == 'GET':
+        result = StockNameCodeMap.objects.filter(stock_code=stock_code)
+        if result is not None:
+            for r in result:
+                return HttpResponse(r.stock_name)
+    return HttpResponse(_('无法找到该股票'))
 
+@login_required
 def get_realtime_quotes(request, ts_code):
      # if this is a GET request we need to process the form data
      # if this is a POST request we need to process the form data
@@ -78,7 +85,7 @@ def get_realtime_quotes(request, ts_code):
 
     return HttpResponse('hello')
 
-
+@login_required
 def get_stock_kline(request, ts_code, start_date, end_date):
     df = []
 
@@ -116,7 +123,63 @@ def get_stock_kline(request, ts_code, start_date, end_date):
     return JsonResponse(df, safe=False)
 
 # Create your views here.
+# @login_required
+def get_stock_kline_ext(request, ts_code, start_date, end_date):
+    df = []
 
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = NameForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            return HttpResponse('Hello')
+    else:
+        # if this is a GET request we need to process the form data
+        pro = ts.pro_api()
+
+        if request.method == 'GET':
+            # create a form instance and populate it with data from the request:
+            df = pro.daily(ts_code=ts_code, start_date=start_date,
+                        end_date=end_date)
+            data = []
+            traderec = []
+            if df is not None and len(df) > 0:
+                for d in df.values:
+                    trade_datetime = datetime.strptime(d[1], "%Y%m%d")
+                    traderec = get_traderec(ts_code, trade_datetime)
+                    data.append(
+                        {
+                            't': trade_datetime,
+                            'o': d[2],
+                            'h': d[3],
+                            'l': d[4],
+                            'c': d[5],
+                            'r': traderec,
+                        }
+                    )
+            return JsonResponse(data[::-1], safe=False)
+    return JsonResponse(df, safe=False)
+
+
+def get_traderec(stock_code, trade_time):
+    traderec_list = TradeRec.objects.filter(stock_code=stock_code,trade_time=trade_time)
+
+    traderec = []
+    if traderec_list is not None:
+        for rec in traderec_list:
+            traderec.append({
+                'name': rec.stock_name,
+                'code': rec.stock_code,
+                'direction': rec.direction,
+                'price': rec.price,
+                'cash': rec.cash,
+            })
+
+    return traderec
 
 class IndexView(ListView):
     # template_name属性用于指定使用哪个模板进行渲染
@@ -134,7 +197,7 @@ class TradeRecCreateView(LoginRequiredMixin, FormView):
     # model = TradeRec
     """Basic CreateView implementation to create new articles."""
     model = TradeRec
-    message = _("Your article has been created.")
+    message = _('新的交易记录创建成功.')
     form_class = TradeRecForm
     template_name = 'traderec/traderec_create.html'
 

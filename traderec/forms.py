@@ -43,8 +43,8 @@ class TradeRecForm(forms.ModelForm):
         model = TradeRec
         # exclude = ['created_time', 'last_mod_time', 'pub_time', 'market',
         #            'featured_image', 'author', 'views', 'comment_status']
-        fields = ['market', 'stock_name', 'stock_code', 'strategy',
-                  'direction', 'trade_time', 'flag', 'price', 'cash', 'position']
+        fields = ['author', 'market', 'stock_name', 'stock_code', 'strategy',
+                  'direction', 'trade_time', 'flag', 'price', 'cash', 'position', ]
 
 
 class NameForm(forms.Form):
